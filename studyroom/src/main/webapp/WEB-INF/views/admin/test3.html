@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>无标题文档</title>
+    <link rel="stylesheet" href="../../../../resources/static/bootstrap/css/bootstrap.min.css">
+    <script src="../../../../resources/static/bootstrap/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../../resources/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../../../resources/static/bootstrap/js/jquery.validate.min.js"></script>
+    <script src="../../../../resources/static/bootstrap/js/messages_zh.js"></script>
+    <script>
+        function publish(){
+            var title = $("#title").val();
+            var text = $("#text").val();
+            if (title == ""){
+                alert("通知标题不能为空！");
+            }else if (text == ""){
+                alert("通知内容不能为空！");
+            }else{
+                alert("发布成功");
+
+            }
+
+        }
+    </script>
+</head>
+<body>
+<!--导航条-->
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">图书馆自习室预约管理后台系统</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav" style="font-size: 15px">
+                <li class="active"><a href="/user/personality">学生信息<span class="sr-only">(current)</span></a></li>
+                <li><a href="#">座位管理</a></li>
+                <li><a href="#">选座管理</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">数据统计<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">学生信誉信息</a></li>
+                        <li><a href="#">自习室使用情况</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">防疫溯源</a></li>
+                <li><a href="#">通知管理</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon glyphicon-user" aria-hidden="true"></span>
+                    <span class="text-default">${administrator.name}</span></a></li>
+                <li>
+                    <a href="/admin/logout" onclick="return logout()"><span class="glyphicon glyphicon glyphicon-off" aria-hidden="true"></span>
+                        <span>退出</span></a>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<!--页面主体内容-->
+<div class="container-fiuld">
+    <div class="row" style="margin-top: 60px">
+        <div class="col-sm-12 col-sm-offset-3">
+            <div class="row" style="margin-top: 0px">
+                <button type ="button" id="back"  class="btn btn-primary" onclick="" style="font-size: 14px;font-weight: bold;
+                " >返回通知列表</button>
+            </div>
+        </div>
+        <div class="col-sm-12 col-sm-offset-3">
+            <div class="row">
+                <div class="form-group" style="margin-top: 40px;  width:50%; ">
+                    <h4 style="text-align: center; font-weight: bold ">关于图书馆自习室开放时间的通知</h4>
+                    <p style="text-align: right ;height: 5px">发布日期: 2020-12-15</p>
+                    <hr/>
+                    <div>
+                        各位同学：
+                        本图书馆自习室的开放时间为8:00-22:00，请需要使用自习室的学生提前一天做好预约，并于当天在预约时间内准时签到。                                                                                   图书馆自习室<br />                                                                                  2020年12月15日
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>座位预约</title>
+    <link rel="stylesheet" href="../../../../resources/static/bootstrap/css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="../../../../resources/static/bootstrap/css/jquery.seat-charts.css">-->
+    <!--<link rel="stylesheet" href="../../../../resources/static/bootstrap/css/style.css">-->
+    <script src="../../../../resources/static/bootstrap/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../../resources/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../../../resources/static/bootstrap/js/jquery.validate.min.js"></script>
+    <script src="../../../../resources/static/bootstrap/js/messages_zh.js"></script>
+    <script src="../../../../resources/static/bootstrap/js/jquery.seat-charts.min.js"></script>
+    <style>
+        .front{width: 150px;margin: 5px 0px 10px 200px;background-color: #f0f0f0; color: #666;text-align: center;padding: 3px;border-radius: 5px;}
+        .booking-details {float: left;position: relative;width:200px;height: 450px; margin-left: -200px;margin-top: 50px}
+        .booking-details h3 {margin: 5px 5px 0 0;font-size: 16px;}
+        .booking-details p{line-height:26px; font-size:16px; color:#999}
+        .booking-details p span{color:#666}
+        div.seatCharts-cell {color: #182C4E;height: 40px;width: 40px;line-height: 40px;margin: 3px;float: left;text-align: center;outline: none;font-size: 13px;}
+        div.seatCharts-seat {color: #fff;cursor: pointer;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius: 5px;}
+        div.seatCharts-row {height: 35px;}
+        div.seatCharts-seat.available {background-color: #B9DEA0;}
+        div.seatCharts-seat.focused {background-color: #76B474;border: none;}
+        div.seatCharts-seat.selected {background-color: #E6CAC4;}
+        div.seatCharts-seat.reserved {background-color: #337ab7;cursor: not-allowed;}
+        div.seatCharts-seat.unavailable {background-color: #472B34;cursor: not-allowed;}
+        div.seatCharts-container {margin-top: 0px; border-right: 1px dotted #adadad;width: 550px;padding: 10px;float: left;}
+        div.seatCharts-legend {padding-left: 0px;position: absolute;bottom: 16px;}
+        ul.seatCharts-legendList {padding-left: 0px;}
+        .seatCharts-legendItem{float:left; width:200px;margin-top: 10px;line-height: 2;}
+        span.seatCharts-legendDescription {margin-left: 5px;line-height: 30px;}
+        .checkout-button {display: block;width:80px; height:24px; line-height:20px;margin: 10px auto;border:1px solid #999;font-size: 14px; cursor:pointer}
+        #selected-seats {max-height: 150px;overflow-y: auto;overflow-x: auto;width: 200px;}
+        #selected-seats li{float:left; width:72px; height:26px; line-height:26px; border:1px solid #d3d3d3; background:#f7f7f7; margin:6px; font-size:14px; font-weight:bold; text-align:center}
+    </style>
+    <script>
+        var price = 80; //票价
+        $(document).ready(function() {
+            var $cart = $('#selected-seats'), //座位区
+            SeatLabel=1;
+            var sc = $('#seat-map').seatCharts({
+                map: [  //座位图
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa',
+                    'aaaaaaaaaa'
+                ],
+                legend : { //定义图例
+                    node : $('#legend'),
+                    items : [
+                        [ 'a', 'available',   '可选座' ],
+                        [ 'a', 'reserved', '已预约'],
+                        [ 'a', 'unavailable', '已关闭']
+                    ]
+                },
+                naming : {
+                    top : false,//不显示列的编号
+                    left:true,   //显示左边（行）的编号
+                    row:['1','2','3','4','5','6','7','8','9','10'],//可以自定义行和列
+                    columns: ['1','2','3','4','5','6','7','8','9','10'], //过道也要给个编号！！！
+                    getLabel : function (character, row, column) {
+                        return SeatLabel ++;
+                    }//label中显示序号
+                },
+                click: function () { //点击事件
+                    if (this.status() == 'available') { //可选座
+                        if (window.hasSelected) { alert('一个学生只能选择一个座位');return 'available'}
+                        $('<li>'+(this.settings.row+1)+'排'+this.settings.label+'座</li>')
+                            .attr('id', 'cart-item-'+this.settings.id)
+                            .data('seatId', this.settings.id)
+                            .appendTo($cart);
+
+                        window.hasSelected = true;
+                        return 'selected';
+                    } else if (this.status() == 'selected') { //已选中
+                        window.hasSelected = false;
+                        //更新数量
+                        //删除已预订座位
+                        $('#cart-item-'+this.settings.id).remove();
+                        //可选座
+                        return 'available';
+                    } else if (this.status() == 'unavailable') { //已关闭
+                        return 'unavailable';
+                    } else if (this.status() == 'reserved') { //已预约
+                        return 'unavailable';
+                    } else {
+                        return this.style();
+                    }
+                }
+            });
+            //已售出的座位
+            sc.get(['1_2', '4_4','4_5','6_6','6_7','8_5','8_6','8_7','8_8', '10_1', '10_2']).status('unavailable');
+            sc.get(['1_3', '2_6']).status('reserved');
+
+        });
+    </script>
+</head>
+<body>
+<!--导航条-->
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">图书馆自习室预约管理系统</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav" style="font-size: 15px">
+                <li><a href="/user/personality">个人信息</a></li>
+                <li class="active"><a href="/reserve">预约选座<span class="sr-only">(current)</span></a></li>
+                <li><a href="#">预约记录</a></li>
+                <li><a href="#">通知查看</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon glyphicon-user" aria-hidden="true"></span>
+                    <span class="text-default">${student.name}</span>&nbsp;&nbsp;同学</a></li>
+                <li>
+                    <a href="/logout" onclick="return logout()"><span class="glyphicon glyphicon glyphicon-off" aria-hidden="true"></span>
+                        <span>退出</span></a>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<!--页面主体内容-->
+<div class="container-fiuld">
+    <div class="row" style="margin-top:40px">
+        <div class="col-sm-6 col-sm-offset-3" style="border: 1px solid black;height: 50px">
+            <select id="year" onchange="addDay()" style="margin-top:10px;height:30px;width: 100px">
+                <option></option>
+            </select>
+            <label>年</label>
+            <select id="month" onchange="addDay()" style="margin-top:10px;margin-left:10px;height:30px;width: 100px">
+                <option></option>
+            </select>
+            <label>月</label>
+            <select id="date" onchange="addDay()" style="margin-top:10px;margin-left:10px;height:30px;width: 100px">
+                <option></option>
+            </select>
+            <label>日</label>
+
+            <select id="starttime" onchange="addTime()" style="margin-top:10px;margin-left:30px;height:30px;width: 100px">
+
+            </select>
+            <label>--</label>
+            <select id="endtime" style="margin-top:10px;height:30px;width: 100px">
+
+            </select>
+            <button id="search" type="button" class="btn btn-primary" style="font-size: 14px;font-weight: bold;float: right;
+                margin-top:7px;margin-right: 20px" onclick="">查询</button>
+        </div>
+    </div>
+    <div class="row" style="margin-top:5px">
+        <div class="col-sm-6 col-sm-offset-3" style="border: 1px solid black">
+            <div id="seat-map">
+                <div class="front">入口</div>
+            </div>
+        </div>
+        <div class="booking-details">
+            <p>日期：<span>2020-11-28</span></p>
+            <p>时间：<span>8:00-10:00</span></p>
+            <p>座位：</p>
+            <ul id="selected-seats"></ul>
+            <button type="button" class="btn btn-primary" style="font-size: 14px;font-weight: bold;margin-top:10px;margin-left: 60px">预约</button>
+            <div id="legend"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var year_slt = document.getElementById('year');
+    var month_slt = document.getElementById('month');
+    var day_slt = document.getElementById('date');        //提取日期
+    var now = new Date();
+    now_year = now.getFullYear();         //获取当前年份
+    for(i=now_year;i<=now_year+50;i++){              //从当前年份选近70年
+        var opt_year = document.createElement('option');       //造元素
+        opt_year.value = i;
+        opt_year.innerText = i;
+        year_slt.appendChild(opt_year);               //赋给天数的下拉框
+    }
+    for(i=1;i<=12;i++){
+        var opt_month = document.createElement('option');
+        opt_month.value = i;
+        if (i<10){
+            opt_month.innerText = '0'+i;
+        } else {
+            opt_month.innerText = i;
+        }
+        month_slt.appendChild(opt_month);
+    }
+    function isRun(year){                        //判断闰年和平年，需确定二月份天数
+        if((year%4==0 && year%100!==0)||year%400==0){
+            return 29;
+        }else{
+            return 28;
+        }
+    }
+    function addDay(){
+        day_slt.innerHTML = '';
+        if(month_slt.value==1||month_slt.value==3||month_slt.value==5||month_slt.value==7||month_slt.value==8||month_slt.value==10||month_slt.value   ==12){
+            for(var i=1;i<=31;i++){
+                var opt_day = document.createElement('option');
+                opt_day.value = i;
+                if (i<10){
+                    opt_day.innerText = '0'+i;
+                } else {
+                    opt_day.innerText = i;
+                }
+                day_slt.appendChild(opt_day);         //选出31天的月份，赋天数1~31
+            }
+        }else if(month_slt.value==4||month_slt.value==6||month_slt.value==9||month_slt==11){
+            for(var i=1;i<=30;i++){
+                var opt_day = document.createElement('option');
+                opt_day.value = i;
+                if (i<10){
+                    opt_day.innerText = '0'+i;
+                } else {
+                    opt_day.innerText = i;
+                }
+                day_slt.appendChild(opt_day);          // //选出30天的月份，赋天数1~30
+            }
+        }else{
+            for(var i=1;i<=isRun(year_slt.value);i++){
+                var opt_day = document.createElement('option');
+                opt_day.value = i;
+                if (i<10){
+                    opt_day.innerText = '0'+i;
+                } else {
+                    opt_day.innerText = i;
+                }
+                day_slt.appendChild(opt_day);      //确定二月份的天数
+            }
+        }
+    }
+    var start_slt = document.getElementById('starttime');
+    var end_slt = document.getElementById('endtime');
+    var start = 8;
+    var end = 22;
+    for (i=start;i<=end;i++){
+        var opt_start = document.createElement('option');
+        opt_start.value=i;
+        if (i<10){
+            opt_start.innerText = '0'+i+':00';
+        }else {
+            opt_start.innerText = i+':00';
+        }
+        start_slt.appendChild(opt_start);
+    }
+    for (i=start+1;i<end;i++){
+        var opt_end = document.createElement('option');
+        opt_end.value=i;
+        if (i<10){
+            opt_end.innerText = '0'+i+':00';
+        }else {
+            opt_end.innerText = i+':00';
+        }
+        end_slt.appendChild(opt_end);
+    }
+    function addTime() {
+        end_slt.innerText='';
+        var x = parseInt(start_slt.value)+1;
+        console.log(x)
+        for (i=x;i<=end;i++){
+            var opt_end = document.createElement('option');
+            opt_end.value=i;
+            if (i<10){
+                opt_end.innerText = '0'+i+':00';
+            }else {
+                opt_end.innerText = i+':00';
+            }
+            end_slt.appendChild(opt_end);
+        }
+    }
+</script>
+</body>
+</html>
